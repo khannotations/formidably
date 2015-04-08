@@ -1,0 +1,19 @@
+<h1>Your Batches</h1>
+<div class="row spaced">
+  <% @batches.each do |batch| %>
+    <div class="col-sm-2">
+      <a href="/batch/<%= batch['id'] %>" class="no-effect">
+        <div class="box">
+            <p class=""><%= batch["name"] %></p>
+          <p class="spaced">
+            <%= pluralize(batch["file_count"], "file") %>
+          </p>
+          <p class="smaller italic grey">
+            Created by <%= batch["created_by"] %> on <%= DateTime.parse(batch["created"]).strftime("%c") %>
+          </p>
+        </div>
+      </a>
+    </div>
+  <% end %>
+</div>
+

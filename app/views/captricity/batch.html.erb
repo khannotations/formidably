@@ -1,0 +1,25 @@
+<h1><%= @batch["name"] %></h1>
+<div class="row spaced">
+  <div class="col-sm-12">
+    <div class="box">
+      <span class="big bold">Choose a file to upload: </span>
+      <%= form_tag("/batch/#{@batch['id']}/upload", method: "post", multipart: true, class: "form-inline") do %>
+        <input type="file" name="file">
+        <input type="text" placeholder="(Optional) filename" name="filename">
+        <input type="submit" value="Upload" name="submit">
+      <% end %>
+    </div>
+  </div>
+</div>
+<div class="row spaced">
+<% @files.each do |file| %>
+  <div class="col-sm-6">
+    <a href="<%= @file_url_base + file["id"].to_s + "/download" %>">
+      <p>Download file <%= file["file_name"] %></p>
+    </a>
+    <img src="<%= @file_url_base + file["id"].to_s + "/page/0/thumbnail/490w" %>" alt="">
+    <!-- <iframe src="<%= @file_url_base + file["id"].to_s + "/download" %>" frameborder="0" width="100%"></iframe> -->
+  </div>
+<% end %>
+</div>
+

@@ -1,0 +1,92 @@
+@mixin opacity($o) {
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=#{$o})";
+  -moz-opacity: $o;
+  -khtml-opacity: $o;
+  opacity: $o;
+  // filter: alpha(opacity=$o);
+}
+
+/* Variables */
+$serif: "Quadraat" serif;
+$sans: "Mark" helvetica sans;
+/* Colors*/
+$blue: #6fafef;
+// #41BDFF;
+// #66042;
+// #4179b7;
+$red: #FF4945;
+$green: #56F04D;
+
+/* Layout */
+// Widths are upper bounds
+$xs-width: 480px;  // "Phone" width
+$sm-width: 768px;  // Bootstrap sm
+$md-width: 992px;  // Bootstrap md
+$lg-width: 1200px; // Bootstrap lg
+
+// Always use in ascending order; sm applies to sm, md, and lg. 
+@mixin sm {
+  @media only screen and (min-width: #{$sm-width}) { @content; }
+}
+@mixin md {
+  @media only screen and (min-width: #{$md-width}) { @content; }
+}
+@mixin lg {
+  @media only screen and (min-width: #{$lg-width}) { @content; }
+}
+/* Can't @extend .hide from @media directive :( */
+
+// Hide below given width
+.no-sm {
+  display: none;
+  @include sm {
+    display: initial;
+  }
+}
+.no-md {
+  display: none;
+  @include md {
+    display: initial;
+  }
+}
+.no-lg {
+  display: none;
+  @include lg {
+    display: initial;
+  }
+}
+// Hide above certain width
+.xs-only {
+  @include sm {
+    display: none;
+  }
+}
+.sm-only {
+  @include md {
+    display: none;
+  }
+}
+.md-only {
+  @include lg {
+    display: none;
+  }
+}
+
+.centered { text-align: center; }
+.justified { text-align: justify; }
+.sans { font-family: $sans; }
+.serif { font-family: $serif; }
+.bold { font-weight: bold; }
+.italic { font-style: italic; }
+.spaced { margin-bottom: 20px; }
+.big-spaced { margin-bottom: 50px; }
+.grey { color: #999; }
+.padded { padding: 15px; }
+.rounded { border-radius: 2px; }
+.bigger { font-size: 120%; }
+.smaller { font-size: 80%; }
+
+.blue { color: $blue; }
+.red { color: $red; }
+.green { color: $green; }
+

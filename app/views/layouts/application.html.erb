@@ -2,13 +2,34 @@
 <html>
 <head>
   <title>Formidably</title>
-  <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
-  <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+  <%= stylesheet_link_tag    'application', media: 'all' %>
   <%= csrf_meta_tags %>
 </head>
 <body>
-
-<%= yield %>
-
+  <div class="header">
+    <div class="container">
+      <div class="row">
+        <div class="col-xs-12">
+          <a href="/">
+            <div class="item">
+              Formidably
+            </div>
+          </a>
+            <div class="right">
+              <a href="/program">
+                <div class="item">BATCHES</div>
+              </a>
+              <a href="/team">
+                <div class="item">OTHER</div>
+              </a>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container top-pad">
+    <%= yield %>
+  </div>
+  <%= javascript_include_tag 'application' %>
 </body>
 </html>
