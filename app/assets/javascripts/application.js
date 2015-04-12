@@ -1,6 +1,9 @@
 //= require jquery
 //= require jquery_ujs
-//= require jquery-fileupload
+//= require json2
 //= require underscore
 //= require backbone
+//= require schema
+//= require backbone/formidably
+//= require_tree ./backbone
 //= require_tree .

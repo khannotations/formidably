@@ -8,4 +8,15 @@ class User < ActiveRecord::Base
 
   validates_presence_of :email
   validates_uniqueness_of :email
+
+  def serializable_hash(options={})
+    options = {
+      :include => :organization,
+      :except => [
+        :created_at, :updated_at, :uid, :provider
+      ],
+      :methods => []
+    }.update(options)
+    super(options)
+  end
 end

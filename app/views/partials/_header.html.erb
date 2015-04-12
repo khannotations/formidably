@@ -16,9 +16,12 @@
                 <div class="item">Sign up</div>
               <% end %>
             <% else %>
-              <a href="/profile">
+              <a href="/dashboard/#/profile">
                 <div class="item">Profile</div>
               </a>
+              <%= link_to destroy_user_session_path, method: :delete do %>
+                <div class="item">Logout</div>
+              <% end %>
             <% end %>
           </div>
       </div>

@@ -1,0 +1,25 @@
+<%= render partial: "partials/header"  %>
+<div id="backbone"></div>
+
+<script type="text/javascript">
+  Formidably.schema = new captricity.APISchema();
+  Formidably.schema.fetch({success: function() {
+    console.log("Captricity API ready");
+    // Bootstrap models from database to avoid AJAX
+    Formidably.Jobs = new Formidably.Collections.Jobs;
+    Formidably.Batches = new Formidably.Collections.Batches;
+    Formidably.Documents = new Formidably.Collections.Documents;
+
+    Formidably.Jobs.reset(<%= @jobs.to_json.html_safe %>)
+    Formidably.Batches.reset(<%= @batches.to_json.html_safe %>)
+    Formidably.Documents.reset(<%= @templates.to_json.html_safe %>)
+
+    window.router = new Formidably.Router({currentUser: 
+      <%= @user.to_json.html_safe %>});
+    Backbone.history.start();
+  }}).error(function() {
+    console.log("You must be logged in to use the API.");
+  });
+</script>
+
+<%= render partial: "partials/footer" %>

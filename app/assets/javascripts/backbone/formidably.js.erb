@@ -1,0 +1,45 @@
+"use strict";
+
+window.captricity = window.captricity || {};
+captricity.endpointURL = 'https://shreddr.captricity.com/api/backbone/schema';
+captricity.apiToken = 'cb870e6253ce41a8b96b706a2bd0278e';
+
+window.Formidably = {
+  Models: {},
+  Collections: {},
+  Views: {},
+  Router: Backbone.Router.extend({
+    initialize: function(options) {
+      Formidably.currentUser = options.currentUser;
+      window.captricity.Jobs = new captricity.api.Jobs();
+      window.captricity.Documents = new captricity.api.Documents();
+      window.captricity.Batches = new captricity.api.Batches();
+    },
+    routes: {
+      "":         "dashboard",
+      "upload":   "upload",
+      "download": "download"
+    },
+    dashboard: function () {
+      this.dashboardView = new Formidably.Views.Dashboard();
+      $("#backbone").html(this.dashboardView.el);
+    },
+    upload: function() {
+      this.uploadView = new Formidably.Views.Upload;
+      $("#backbone").html(this.uploadView.el);
+    },
+    download: function() {
+      // this.downloadView = new Formidably.Views.Download;
+      // $("#backbone").html(this.downloadView.el);
+    }
+  })
+};
+
+// Date for IE
+if (!Date.now) {
+  Date.now = function() { return new Date().getTime(); }
+}
+
+window.timestamp = function() {
+  return Math.floor(Date.now() / 1000);
+}
