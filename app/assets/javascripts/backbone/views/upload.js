@@ -10,7 +10,7 @@ Formidably.Views.Upload = Backbone.View.extend({
     "click .js-template": "selectTemplate",
     "change #files": "filesChange",
     "click #submit": "submitFiles",
-    "click #submit-batch": "submitBatch"
+    "click #submit-job": "submitJob"
   },
   render: function() {
     this.$el.html(this.template({templates: Formidably.Documents.models}));
@@ -47,41 +47,19 @@ Formidably.Views.Upload = Backbone.View.extend({
       alert(this.fileError);
       return false;
     }
-    this.batch = new captricity.api.Batch();
     var t = this;
-    this.batch.save({
+    captricity.Jobs.create({
       name: this.generateBatchName(),
-      documents: [this.selectedTemplateId],
+      document_id: this.selectedTemplateId,
     }, {
-      success: function() {
-        var batchFiles = new captricity.api.BatchFiles();
-        batchFiles.batch_id = t.batch.id;
-        var totalSize = _.reduce(t.selectedFiles, function(sum, file) {
-          return sum + file.size;
-        }, 0);
-        console.log(t.batch, "batch");
-        var totalCount = t.selectedFiles.length,
-            totalDoneSize = 0,
-            totalDoneCount = 0;
-        _.each(t.selectedFiles, function(file) {
-          var uploader = new captricity.MultipartUploader({
-            'file_name': file.name,
-            'uploaded_file': file
-          }, function(f, percent){
-            if (percent > 99) {
-              totalDoneSize += f.files.uploaded_file.size;
-              totalDoneCount++;
-              var progress = Math.floor(100 * totalDoneSize / totalSize) + "%";
-              console.log(progress);
-              $('#upload-progress').css('width', progress).text(progress);
-              $("#status").text(totalDoneCount + " / " + totalCount +
-                " file(s) uploaded");
-              if (totalDoneCount === totalCount) {
-                t.uploadFinished();
-              }
-            }
-          }, batchFiles.url());
-        });
+      success: function(job) {
+        t.captricityJob = job;
+        t.job = new Formidably.Models.Job({captricityJob: t.captricityJob});
+        t.job.save();
+        Formidably.Jobs.add(t.job);
+        console.log(t.captricityJob, t.job);
+        // Successfully created a job
+        t.uploadFilesToJob(); // Start file upload
       },
       error: function() {
         console.log("error");
@@ -89,30 +67,58 @@ Formidably.Views.Upload = Backbone.View.extend({
     })
   },
 
-  submitBatch: function() {
+  submitJob: function() {
     var t = this;
-    console.log("before", this.batch.related_job_id);
-    captricity.apiPost(captricity.url.submitBatch(this.batch.id), {
-      success: function(batch) {
-        console.log("after", batch, t.batch.related_job_id);
-        console.log("batch submit success");
+    captricity.apiPost(captricity.url.submitJob(this.captricityJob.id), {
+      success: function() {
+        t.job.set('started', "");
+        t.job.save(); // Persist to server
       }
     });
   },
 
   // Support
+  uploadFilesToJob: function() {
+    var t = this,
+        instanceSets = new captricity.api.InstanceSets;
+
+    instanceSets.id = this.captricityJob.id;
+    var totalSize = _.reduce(this.selectedFiles, function(sum, file) {
+      return sum + file.size;
+    }, 0);
+    var totalCount = t.selectedFiles.length,
+        totalDoneSize = 0,
+        totalDoneCount = 0;
+    _.each(t.selectedFiles, function(file) {
+      var uploader = new captricity.MultipartUploader({
+        'name': file.name,
+        'multipage_file': file
+      }, function(f, percent){
+        console.log(f);
+        if (percent > 99) {
+          totalDoneSize += f.files.multipage_file.size;
+          totalDoneCount++;
+          var progress = Math.floor(100 * totalDoneSize / totalSize) + "%";
+          console.log(progress);
+          $('#upload-progress').css('width', progress).text(progress);
+          $("#status").text(totalDoneCount + " / " + totalCount +
+            " file(s) uploaded");
+          if (totalDoneCount === totalCount) {
+            t.uploadFinished();
+          }
+        }
+      }, instanceSets.url(), 'POST');
+    });
+  },
+
   uploadFinished: function() {
-    $("#submit-batch").show();
-    var Readiness = new captricity.api.BatchReadiness({id: this.batch.id}),
-        Price = new captricity.api.BatchPrice({id: this.batch.id});
+    $("#submit-job").show();
+    var Readiness = new captricity.api.JobReadiness({id: this.captricityJob.id}),
+        Price = new captricity.api.JobPrice({id: this.captricityJob.id});
     Readiness.fetch({success: function(data) {
       console.log("Readiness", Readiness.attributes);
-      if (Readiness.attributes.errors.length) {
-        $("#readiness").text("Batch is not ready to be processed. " + 
-          "Check logs for errors.");
-        console.log("Readiness errors:", Readiness.attributes.errors);
-      } else {
-        $("#readiness").text("Batch is ready for processing!");
+      if (Readiness.is_read_to_submit) {
+        $("#readiness").text("Batch is ready to submit!");
       }
     }});
     Price.fetch({success: function(data) {
@@ -121,7 +127,6 @@ Formidably.Views.Upload = Backbone.View.extend({
       $("#price").text("Will use " + as.user_pay_go_fields_applied + 
         " of " + as.user_pay_go_fields + " credits.");
     }});
-    alert("upload finished!");
     // Submit batch
   },
   generateBatchName: function() {

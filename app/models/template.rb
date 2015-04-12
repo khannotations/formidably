@@ -1,3 +1,5 @@
+require 'captricity/api'
+
 class Template < ActiveRecord::Base
   include Captricity
 
@@ -20,7 +22,7 @@ class Template < ActiveRecord::Base
 
   def serializable_hash(options={})
     options = {
-      :include => :jobs,
+      # :include => :jobs,
       :except => [
         :created_at, :updated_at
       ],

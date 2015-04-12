@@ -100,6 +100,10 @@ module Captricity
       }
     end
 
+    def delete_job(job_id)
+      delete_request "job/#{job_id}"
+    end
+
     def get_job_csv(job_id)
       get_request "job/#{job_id}/csv/"
     end

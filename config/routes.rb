@@ -3,7 +3,7 @@ Rails.application.routes.draw do
 
   scope '/api' do
     scope '/v1' do
-      resources :batches
+      resources :jobs, only: [:index, :show, :create, :update]
     end
   end
   get 'upload' => 'captricity#upload'

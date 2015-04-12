@@ -5,6 +5,7 @@ class CreateBatches < ActiveRecord::Migration
       t.string :name
       t.belongs_to :organization
       t.belongs_to :template
+      t.string :status
 
       t.timestamps
     end

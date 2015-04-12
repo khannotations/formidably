@@ -1,0 +1,28 @@
+<div class="row">
+  <% if (!jobs.length) { %>
+    <div class="col-sm-8 col-sm-offset-2">
+      <p class="big spaced">You haven't made any jobs yet—create one now!</p>
+      <p class="small grey italic">(If you have created jobs, then we've encountered an error—please try again later)</p>
+    </div>
+  <% } %>
+  <% for (var i=0; i<jobs.length; i++) { %>
+    <% var job = jobs[i] %>
+    <% var barClass = (job.get('status') === "completed") ? "progress-bar-success":"" %>
+    <div class="col-sm-6">
+
+      <h3 class="bold spaced"><%= job.get('name') %></h3>
+      <p class="italic spaced">Created on <%= job.get('created') %></p>
+      <div class="progress">
+        <div class="progress-bar <%= barClass %>" role="progressbar" style="width: <%= job.get('percent_completed') %>%;">
+          <%= job.get('percent_completed') %>% Complete
+        </div>
+      </div>
+      <div class="box">
+        <span class="bold"><%= job.get('status') %></span>
+        <% if (job.get('status') === "completed") { %>
+          <span>on <em><%= job.get('finished') %></em></span>
+        <% } %>
+      </div>
+    </div>
+  <% } %>
+</div>

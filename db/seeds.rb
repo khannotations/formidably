@@ -1,3 +1,5 @@
+Template.sync
+
 f = Organization.create!({
   name: "Formidably"
 })
@@ -9,6 +11,8 @@ r = User.create!({
   password: "rafikhan",
   password_confirmation: "rafikhan"
 })
+r.confirmed_at = DateTime.now
+r.save!
 
 m = User.create!({
   first_name: "Megan",
@@ -17,17 +21,14 @@ m = User.create!({
   password: "meganvalentine",
   password_confirmation: "meganvalentine"
 })
+m.confirmed_at = DateTime.now
+m.save!
 
 j = Job.create!({
   name: "WHO_contact_tracing",
-  cid: 113311
+  cid: 113311,
+  document_cid: Template.first.cid # Example
 })
-
-r.confirmed_at = DateTime.now
-r.save!
-
-m.confirmed_at = DateTime.now
-m.save!
 
 f.users << r
 f.users << m

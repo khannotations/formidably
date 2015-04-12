@@ -21,6 +21,7 @@ ActiveRecord::Schema.define(version: 20150409070759) do
     t.string   "name"
     t.integer  "organization_id"
     t.integer  "template_id"
+    t.string   "status"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -28,8 +29,12 @@ ActiveRecord::Schema.define(version: 20150409070759) do
   create_table "jobs", force: true do |t|
     t.integer  "cid"
     t.string   "name"
+    t.string   "created"
+    t.string   "started"
+    t.string   "finshed"
     t.integer  "organization_id"
     t.integer  "template_id"
+    t.integer  "document_cid"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
