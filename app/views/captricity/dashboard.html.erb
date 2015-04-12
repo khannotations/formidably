@@ -1,0 +1,45 @@
+<%= render partial: "partials/header"  %>
+
+<div class="container top-pad big">
+
+  <h1 class="big-spaced">Work with Data</h1>
+  <div class="row big-spaced">
+    <div class="col-sm-4 col-sm-offset-2">
+      <a href="/upload" class="btn btn-block btn-lg btn-primary">UPLOAD</a>
+    </div>
+    <div class="col-sm-4">
+      <a href="/download" class="btn btn-block btn-lg btn-info">DOWNLOAD</a>
+    </div>
+  </div>
+  <hr>
+  <h1>Active jobs for <%= @user.organization.name %></h1>
+  <div class="row">
+    <% if @jobs.empty? %>
+      <div class="col-sm-8 col-sm-offset-2">
+        <p class="big spaced">You haven't made any jobs yet—create one now!</p>
+        <p class="small grey italic">(If you have created jobs, then we've encountered an error—please try again later)</p>
+      </div>
+    <% end %>
+    <% @jobs.each do |job| %>
+      <div class="col-sm-6">
+        <h3 class="bold spaced"><%= job["name"] %></h3>
+        <p class="italic spaced">Started on <%= DateTime.iso8601(job["started"]).strftime("%c") %></p>
+        <% if job["status"] == "completed" then type = "progress-bar-success" else type = "" end %>
+        <div class="progress">
+          <div class="progress-bar <% type %>" role="progressbar" style="width: <%= job["percent_completed"] %>%;">
+            <%= job["percent_completed"] %>% Complete
+          </div>
+        </div>
+        <div class="box">
+          <span class="bold"><%= job["status"].capitalize %></span>
+          <% if job["status"] == "completed" %>
+            <span>on <em><%= DateTime.iso8601(job["finished"]).strftime("%c") %></em></span>
+          <% end %>
+        </div>
+        <%= job %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<%= render partial: "partials/footer"  %>

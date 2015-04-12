@@ -1,3 +1,25 @@
+html, body {
+  height: 100%;
+  margin: 0; padding: 0;
+  font: normal 16px/1.4 $sans;
+  -webkit-font-smoothing: antialiased;
+}
+
+p {
+  margin-bottom: 0;
+  &.big { font-size: 120%; }
+  &.banner {
+    @extend .serif;
+    @extend .centered;
+    font-size: 150%;
+    margin: 20px 0;
+    @include sm {
+      font-size: 180%;
+      margin: 30px 0;
+    }
+  }
+}
+
 a, .a-like {
   text-decoration: none;
   color: $blue;
@@ -25,7 +47,7 @@ a, .a-like {
   &.top-pad {
     padding-top: 40px;
     &.big {
-      padding-top: 80px;
+      padding-top: 60px;
     }
   }
 }
@@ -90,4 +112,22 @@ a, .a-like {
   .box-icon {
     padding: 20px 40px;
   }
+  &.hover:hover {
+    border: 1pt solid #777;
+  }
+  &.selected {
+    border: 1pt solid $blue !important;
+  }
+  transition: border-color 0.2s;
+}
+
+.footer {
+  background-color: #222;
+  margin-top: 20px;
+  padding: 30px 0;
+  @include sm {
+    margin-top: 30px;
+    padding: 40px 0;
+  }
+  color: white;
 }

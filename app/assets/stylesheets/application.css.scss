@@ -2,8 +2,12 @@
 @import "bootstrap/variables";
 @import "bootstrap/scaffolding";
 @import "bootstrap/grid";
-@import "bootstrap/tables";
+@import "bootstrap/buttons";
 @import "bootstrap/dropdowns";
+@import "bootstrap/progress-bars";
+
+// @import "jquery.fileupload";
+@import "jquery.fileupload-ui.scss";
 
 @import "variables";
 @import "style";

@@ -1,3 +1,19 @@
+@font-face {
+  font-family: "Mark";
+  font-weight: 200;
+  src: url('/assets/MarkLight.otf');
+}
+@font-face {
+  font-family: "Mark";
+  font-weight: normal;
+  src: url('/assets/MarkBook.otf');
+}
+@font-face {
+  font-family: "Mark";
+  font-weight: bold;
+  src: url('/assets/MarkBold.otf');
+}
+
 @mixin opacity($o) {
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=#{$o})";
   -moz-opacity: $o;
@@ -85,6 +101,7 @@ $lg-width: 1200px; // Bootstrap lg
 .rounded { border-radius: 2px; }
 .bigger { font-size: 120%; }
 .smaller { font-size: 80%; }
+.full-width { width: 100%; }
 
 .blue { color: $blue; }
 .red { color: $red; }

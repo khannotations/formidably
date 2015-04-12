@@ -1,6 +1,11 @@
 Rails.application.routes.draw do
-  root 'captricity#batches'
+  devise_for :users
 
-  get 'batch/:id' => 'captricity#batch'
-  post 'batch/:id/upload' => 'captricity#upload'
+  get 'dashboard' => 'captricity#dashboard', as: 'dashboard'
+  get 'upload' => 'captricity#upload'
+  get 'batch/:id' => 'captricity#get_batch'
+  post 'batch' => 'captricity#create_batch'
+  post '/upload_files' => 'captricity#upload_files'
+
+  root to: 'main#index'
 end

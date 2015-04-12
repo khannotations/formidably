@@ -1,0 +1,27 @@
+<div class="header">
+  <div class="container">
+    <div class="row">
+      <div class="col-xs-12">
+        <a href="/">
+          <div class="item">
+            Formidably
+          </div>
+        </a>
+          <div class="right">
+            <% unless user_signed_in? %>
+              <%= link_to new_user_session_path do %>
+                <div class="item">Login</div>
+              <% end %>
+              <%= link_to new_user_registration_path do %>
+                <div class="item">Sign up</div>
+              <% end %>
+            <% else %>
+              <a href="/profile">
+                <div class="item">Profile</div>
+              </a>
+            <% end %>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>

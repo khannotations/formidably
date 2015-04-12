@@ -1,104 +1,64 @@
-module Captricity
-  class API
-    include RestClient
-    @@BASE_URL = "https://shreddr.captricity.com/api/v1/"
-
-    def initialize(api_key="cb870e6253ce41a8b96b706a2bd0278e")
-      @api_key = api_key
-      # RestClient.add_before_execution_proc do |req, params|
-      #   params[:headers]["Captricity-API-Token"] = @api_key
-      #   p params
-      # end
-    end
-
-    def get_batches
-      r = RestClient.get @@BASE_URL + "batch/",
-        {"Captricity-API-Token" => @api_key}
-      json_to_hash r
-    end
-
-    def get_batch(id)
-      r = RestClient.get @@BASE_URL + "batch/" + id.to_s,
-        {"Captricity-API-Token" => @api_key}
-      json_to_hash r
-    end
-
-    def create_batch(params={})
-      r = RestClient.post @@BASE_URL + "batch/", {
-        name: params[:name] || "CreatedFromApi",
-        sorting_enabled: params[:sorting_enabled] || true,
-        is_sorting_only: params[:is_sorting_only] || true,
-        documents: [],
-        schemas: []
-      }, {"Captricity-API-Token" => @api_key}
-      json_to_hash r
-    end
-
-    def get_batch_files(batch_id)
-      r = RestClient.get @@BASE_URL + "batch/#{batch_id.to_s}/batch-file/",
-        {"Captricity-API-Token" => @api_key}
-      json_to_hash r
-    end
-
-    # file_handle should either be a file object, or a string URL to 
-    # where the file can be found
-    def upload_file(batch_id, file_handle="./test.pdf", params={})
-      if file_handle.is_a? File
-        file = file_handle
-      else
-        file = File.new(file_handle)
-      end
-      r = RestClient.post @@BASE_URL + "batch/" + batch_id.to_s + "/batch-file/", {
-        uploaded_file: file,
-        file_name: params[:uploaded_file_name] || File.basename(file.path),
-        uploader: params[:uploader] || "Rafi",
-        assemble_immediately: params[:assemble_immediately] || false
-      }, {"Captricity-API-Token" => @api_key}
-      json_to_hash r
-    end
-
-    private
-
-    # def symbolize_keys_deep!(h)
-    #   h.keys.each do |k|
-    #     ks    = k.to_sym
-    #     h[ks] = h.delete k
-    #     symbolize_keys_deep! h[ks] if h[ks].kind_of? Hash
-    #   end
-    # end
-
-    def json_to_hash(json)
-      hash = JSON.parse(json)
-      # symbolize_keys_deep! hash
-    end
-  end
-end
+require 'captricity/api'
 
 class CaptricityController < ApplicationController
   include Captricity
 
+  before_action :authenticate_user!
+
   @@captricity = Captricity::API.new
 
-  def batches 
-    @batches = @@captricity.get_batches
+  def dashboard 
+    @user = current_user
+    @org = @user.organization
+    @org_job_ids = @org.jobs.pluck(:cid)
+    @jobs = @@captricity.get_jobs
+    if @jobs.is_a? Array
+      @jobs = @jobs.select { |j| @org_job_ids.include? j["id"] }
+    else
+      @jobs = []
+      puts "Error" # Throw some error
+    end
   end
 
-  def batch
+  def upload
+    @templates = Template.where(active: true, deleted: false)
+  end
+
+  def get_batch
     @batch = @@captricity.get_batch(params[:id])
     @files = @@captricity.get_batch_files(params[:id])
     @file_url_base = "https://shreddr.captricity.com/api/v1/batch-file/"
   end
 
-  def upload
-    uploaded_io = params[:file]
-    file_path = Rails.root.join('public', 'uploads', "#{rand(100)}" +
-      uploaded_io.original_filename)
-    File.open(file_path, 'wb') do |file|
-      file.write(uploaded_io.read)
+  def create_batch
+    tid = params[:template_id]
+    unless tid.blank?
+      # Todo: put this in Batch model
+      batch = @@captricity.create_batch(Batch.make_name(current_user, tid), 
+        documents: [tid.to_i])
+      render json: batch
+    else
+      render json: {error: "Template can't be blank"}, status: 400
     end
-    @@captricity.upload_file(params[:id], file_path,
-      uploaded_file_name: params[:filename])
-    redirect_to '/batch/' + params[:id]
+  end
+
+  def upload_files
+    batch_id = params[:batch_id]
+    unless batch_id.blank?
+      # byebug
+      uploaded_io = params[:uploadfiles].first
+      file_path = Rails.root.join('public', 'uploads', "#{rand(1000)}" +
+        uploaded_io.original_filename)
+      File.open(file_path, 'wb') do |file|
+        file.write(uploaded_io.read)
+      end
+      response = @@captricity.upload_file(batch_id, uploaded_io.tempfile.path,
+        uploaded_file_name: uploaded_io.original_filename)
+      render json: response
+    else
+      render json: {error: "Batch ID can't be blank"}, status: 400
+    end
+    # redirect_to '/batch/' + params[:id]
   end
 
   private
